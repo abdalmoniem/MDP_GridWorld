@@ -1,0 +1,118 @@
+#!/usr/bin/env python3
+
+###########################################
+# @author:	AbdAlMoniem AlHifnawy			#
+#														#
+# @email:	hifnawy_moniem@hotmail.com 	#
+#														#
+# @date:		Thu Dec 1 5:28:03 PM 			#
+###########################################
+
+from tkinter import *
+from GridWorld import GridWorld
+from GUI import MDPGUI
+from GUI import MDPChooser
+
+def parseWorld(file_path):
+	world = []
+	file = open(file_path, 'r')
+	for line in file:
+		row = []
+		chars = line.rstrip().split(' ')
+		for char in chars:
+			if char.lower() == 'v':
+				row.append(GridWorld.CELL_VOID)
+			elif char.lower() == 'w':
+				row.append(GridWorld.CELL_WALL)
+			elif char.lower() == 'e':
+				row.append(GridWorld.CELL_EXIT)
+			elif char.lower() == 'p':
+				row.append(GridWorld.CELL_PIT)
+		world.append(row)
+	file.close()
+	return world
+
+def startSimulation(mode, w):
+	if mode == "1":	
+		w.setRewards(-0.04, -1, 1)
+		w.setProbabilities(0.8, 0.1, 0.1, 0)
+		w.setDiscountFactor(1)
+		g = MDPGUI(w)
+	elif mode == "2":
+		w.setRewards(-0.04, -1, 1)
+		w.setProbabilities(0.8, 0.1, 0.1, 0)
+		w.setDiscountFactor(0.9)
+		g = MDPGUI(w)
+	elif mode == "3":
+		w.setRewards(-0.01, -1, 1)
+		w.setProbabilities(0.8, 0.1, 0.1, 0)
+		w.setDiscountFactor(1)
+		g = MDPGUI(w)
+	elif mode == "4":	
+		w.setRewards(-2, -1, 1)
+		w.setProbabilities(0.8, 0.1, 0.1, 0)
+		w.setDiscountFactor(0.6)
+		g = MDPGUI(w)
+	else:
+		mdpc = MDPChooser(w)
+	
+	mainloop()
+
+if __name__ == '__main__':
+	
+	def showhelp():
+		hlpStr = ("Markov Decision Process Examples\n" +
+					"Usage: %s gridworld [<number>] [file]\n" %sys.argv[0] +
+				   "numbers:\n" +
+				   "0: manually tweek and set cost, reward, discount, etc..\n" +
+				   "1: standard grid world as the book (step cost -0.04, discount factor 1)\n" +
+				   "2: low discount factor 0.6 (step cost -0.04)\n" +
+				   "3: low step cost -0.01\n" +
+				   "4: suicide mode (step cost -2)\n\n" +
+				   "file: a file containing letters that represent world cells.\n"
+				   "file format:\n" +
+				   "\tletter [letter] [letter] [letter]...\n"
+				   "\tletter [letter] [letter] [letter]...\n"
+				   "\t.\n\t.\n\t.\n\n" +
+				   "letter formats: (all lowercases)\n" +
+				   "\tv\tindicates a void cell\n" +
+				   "\tw\tindicates a wall cell\n" +
+				   "\te\tindicates an exit cell\n" +
+				   "\tp\tindicates a pit cell\n\n" +
+				   "Examples:\n" +
+				   "%s world_file.txt\n" %sys.argv[0] +
+				   "%s 1\n" %sys.argv[0] +
+				   "%s 3 world_file.txt" %sys.argv[0]
+				   )
+		print(hlpStr)
+		exit()
+	
+	if len(sys.argv) < 2: showhelp()
+	
+	elif len(sys.argv) == 2:
+		if not sys.argv[1].isdigit():
+			file_path = sys.argv[1]
+			world = parseWorld(file_path)
+			w = GridWorld(world, discountFactor = 1)
+		else:
+			w = GridWorld([[GridWorld.CELL_VOID, GridWorld.CELL_VOID, GridWorld.CELL_VOID, GridWorld.CELL_EXIT], 
+				   			[GridWorld.CELL_VOID, GridWorld.CELL_WALL, GridWorld.CELL_VOID, GridWorld.CELL_PIT],
+				   			[GridWorld.CELL_VOID, GridWorld.CELL_WALL, GridWorld.CELL_VOID, GridWorld.CELL_WALL],
+				   			[GridWorld.CELL_VOID, GridWorld.CELL_VOID, GridWorld.CELL_VOID, GridWorld.CELL_VOID]], discountFactor = 1)
+
+		mode = sys.argv[1]
+		startSimulation(mode, w)
+
+	elif len(sys.argv) == 3:
+		file_path = sys.argv[2]
+		world = parseWorld(file_path)
+		w = GridWorld(world, discountFactor = 1)
+		mode = sys.argv[1]
+		startSimulation(mode, w)
+	else:
+		w = GridWorld([[GridWorld.CELL_VOID, GridWorld.CELL_VOID, GridWorld.CELL_VOID, GridWorld.CELL_EXIT], 
+					   			[GridWorld.CELL_VOID, GridWorld.CELL_WALL, GridWorld.CELL_VOID, GridWorld.CELL_PIT],
+					   			[GridWorld.CELL_VOID, GridWorld.CELL_WALL, GridWorld.CELL_VOID, GridWorld.CELL_WALL],
+					   			[GridWorld.CELL_VOID, GridWorld.CELL_VOID, GridWorld.CELL_VOID, GridWorld.CELL_VOID]], discountFactor = 1)
+
+		startSimulation(0, w)
