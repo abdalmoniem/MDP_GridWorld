@@ -61,6 +61,8 @@ class MDPGUI:
 				for b in self.radioBAlgorithms: b.config(state=NORMAL)
 				self.computationStarted = False
 				self.bComputation.config(text="Start Computation")
+				self.bComputation.config(state=NORMAL)
+
 				self.computationStarted = False
 				return False
 			
@@ -79,6 +81,7 @@ class MDPGUI:
 	
 	def toggleComputation(self):
 		if not self.computationStarted:
+			self.p.resetResults()
 			self.bComputation.config(text="Stop Computation")
 			self.computationStarted = True
 			self.bResetResults.config(state=DISABLED)
@@ -179,12 +182,16 @@ class MDPGUI:
 #===============================================================================
 		
 class MDPChooser:
-	
 	rew = (("Step Reward", -0.04, "negative"), 
 				("Pit Reward", -1, "negative"),
 				("Exit Reward", 1, "positive"))
 	rewValue = []
 	
+
+	algorithm_rest = (("Number of iterations", 1000),
+							("Max. calculation time (secs)", 3))
+	algorithm_restValue = []
+
 	prob = (("Forward Probability", 0.8), 
 			("Left Probability", 0.1),
 			("Right Probability", 0.1),
@@ -251,6 +258,7 @@ class MDPChooser:
 			w.setDiscountFactor(df)
 			w.setRewards(rews[0], rews[1], rews[2])
 			w.setProbabilities(probs[0], probs[1], probs[2], probs[3])
+			w.setAlgorithmRestrictions(float(self.algorithm_restValue[0].get()), float(self.algorithm_restValue[1].get()))
 			
 			g = MDPGUI(w)
 			
@@ -300,6 +308,20 @@ class MDPChooser:
 		entry = Entry(frame, textvariable=self.discFactor, width=5)
 		entry.pack(side=LEFT)
 		frame.pack(side=TOP, padx=10, pady=5)
+
+		label = Label(self.master, text="Algorithms' restrictions", bg="gray")
+		label.pack(side=TOP, pady=10)
+
+		for labelText, defaultValue in self.algorithm_rest:
+			frame = Frame(self.master)
+			label = Label(frame, text=("%s: " % labelText))
+			label.pack(side=LEFT)
+			value = StringVar()
+			value.set(defaultValue)
+			self.algorithm_restValue.append(value)
+			entry = Entry(frame, textvariable=value, width=5)
+			entry.pack(side=LEFT)
+			frame.pack(side=TOP, padx=10, pady=5)
 	
 		bOpenMDPGUI = Button(self.master, text="Show MDP", command=self.openMDPGUI)
 		bOpenMDPGUI.pack(padx=10, pady=20)

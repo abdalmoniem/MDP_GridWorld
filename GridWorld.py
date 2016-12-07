@@ -107,6 +107,10 @@ class GridWorld:
 				     self.PROB_LEFT     : probToGoLeft, 
 				     self.PROB_RIGHT    : probToGoRight, 
 				     self.PROB_BACKWARD : probToGoBackward}
+
+	def setAlgorithmRestrictions(self, numberOfIterations, ttl):
+		self.numberOfIterations = numberOfIterations
+		self.timeToLive = ttl
 		
 	def possiblePositionsFromAction(self, position, worldAction):
 		'''

@@ -16,8 +16,8 @@ import time
 
 class Policy:
 	valueIterationEpsilon = 0.1
-	maxNumberOfIterations = 10000		#for example the maps that have no exits
-	timeToLive = 3			#number of seconds to iterate before exiting (if algorithm stucks)
+	maxNumberOfIterations = 0		#for example the maps that have no exits
+	timeToLive = 0			#number of seconds to iterate before exiting (if algorithm stucks)
 	_pe_maxk = 50	#for policy evaluation, max number of iteration
 		
 	world = None
@@ -30,6 +30,9 @@ class Policy:
 	def __init__(self, world):
 		self.world = world
 		self.resetResults()
+
+		Policy.maxNumberOfIterations = self.world.numberOfIterations
+		Policy.timeToLive = self.world.timeToLive
 		
 	def __createEmptyUtilityVector(self):
 		'''creates an empty utility vector (that in this case is a matrix), with all number to 0'''
@@ -66,7 +69,6 @@ class Policy:
 		eps = Policy.valueIterationEpsilon
 		dfact = self.world.discFactor
 		c, r = self.world.size
-		
 		if turbo: newUv = self.utilities
 		
 		reiterate = True
